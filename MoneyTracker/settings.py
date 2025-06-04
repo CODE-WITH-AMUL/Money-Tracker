@@ -27,6 +27,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+ALLOWED_HOSTS = [
+    'money-tracker.onrender.com',    # your Render app URL (replace if your Render app name is different)
+    'www.amulsharma.com.np',          # your custom domain (with www)
+    'amulsharma.com.npp',              # also add without www (optional but recommended)
+    'localhost',                     # for local testing
+    '127.0.0.1',                    # for local testing
+]
+
 
 # Application definition
 
