@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Tracker Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                        },
+                        accent: {
+                            purple: '#8B5CF6',
+                            pink: '#EC4899',
+                            cyan: '#06B6D4',
+                            emerald: '#10B981',
+                        },
+                        dark: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        glass: {
+                            light: 'rgba(255, 255, 255, 0.08)',
+                            dark: 'rgba(0, 0, 0, 0.1)',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'bounce-subtle': 'bounceSubtle 2s infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+                        'glow': '0 0 20px rgba(59, 130, 246, 0.5)',
+                        'glow-purple': '0 0 20px rgba(139, 92, 246, 0.5)',
+                        'neu-light': '20px 20px 60px #d1d5db, -20px -20px 60px #ffffff',
+                        'neu-dark': '20px 20px 60px #0f172a, -20px -20px 60px #1e293b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes bounceSubtle {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            }
+            to {
+                box-shadow: 0 0 30px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% {
+                opacity: 1;
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            }
+            50% {
+                opacity: 0.8;
+                box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+            }
+        }
+
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark .glass-morphism {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6, #EC4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .animate-delay-100 { animation-delay: 0.1s; }
+        .animate-delay-200 { animation-delay: 0.2s; }
+        .animate-delay-300 { animation-delay: 0.3s; }
+        .animate-delay-400 { animation-delay: 0.4s; }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            border-radius: 10px;
+        }
+
+        .neo-card {
+            background: #f8fafc;
+            box-shadow: 8px 8px 16px #d1d5db, -8px -8px 16px #ffffff;
+        }
+
+        .dark .neo-card {
+            background: #1e293b;
+            box-shadow: 8px 8px 16px #0f172a, -8px -8px 16px #334155;
+        }
+
+        .holographic {
+            background: linear-gradient(45deg, 
+                rgba(255,255,255,0.1) 0%, 
+                rgba(255,255,255,0.2) 25%,
+                rgba(255,255,255,0.1) 50%,
+                rgba(255,255,255,0.2) 75%,
+                rgba(255,255,255,0.1) 100%);
+            background-size: 200% 200%;
+            animation: holographicShine 3s ease-in-out infinite;
+        }
+
+        @keyframes holographicShine {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+    </style>
+</head>
+<body class="font-sans bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-950 dark:to-dark-900 text-gray-800 dark:text-gray-200 max-w-md mx-auto relative h-screen overflow-hidden">
+    
+    <!-- Animated Background Elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-cyan-400/20 rounded-full blur-3xl animate-float" style="animation-delay: -1.5s;"></div>
+    </div>
+
+    <!-- App Header with Glass Morphism -->
+    <header class="glass-morphism p-6 sticky top-0 z-30 border-b border-white/20">
+        <div class="flex justify-between items-center">
+            <div class="animate-fade-in">
+                <h1 class="text-3xl font-bold gradient-text animate-glow">${{ total_balance }}</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Available Balance</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="w-10 h-10 rounded-2xl glass-morphism flex items-center justify-center transition-all hover:scale-110 hover:shadow-glow">
+                    <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+                    </svg>
+                    <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400 hidden" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                    </svg>
+                </button>
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center animate-pulse-glow">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pb-24 overflow-y-auto h-full pt-4 scroll-smooth">
+        <!-- Add Transaction Form -->
+        <div class="neo-card p-6 rounded-3xl mx-4 mb-6 animate-slide-up">
+            <h2 class="font-semibold text-lg mb-4 dark:text-white">Add Income/Expense</h2>
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div>
+                    <label class="block text-sm font-medium mb-1 dark:text-gray-300">Card</label>
+                    {{ form.card }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1 dark:text-gray-300">Amount</label>
+                    {{ form.amount }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1 dark:text-gray-300">Type</label>
+                    {{ form.type }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1 dark:text-gray-300">Description</label>
+                    {{ form.description }}
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold hover:shadow-glow transition-all">Add Transaction</button>
+            </form>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 gap-4 px-4 mb-6">
+            <div class="neo-card p-5 rounded-3xl animate-slide-up animate-delay-100 hover:shadow-glow transition-all duration-300 group">
+                <div class="flex items-center space-x-3 mb-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold">Income</p>
+                        <p class="text-2xl font-bold dark:text-white">${{ total_income }}</p>
+                    </div>
+                </div>
+                <div class="relative h-2 bg-gray-100 dark:bg-dark-700 rounded-full overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full animate-[width_2s_ease-out] shadow-lg" style="width: 70%"></div>
+                </div>
+                <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-2 font-medium">↗ +12% from last month</p>
+            </div>
+
+            <div class="neo-card p-5 rounded-3xl animate-slide-up animate-delay-200 hover:shadow-glow-purple transition-all duration-300 group">
+                <div class="flex items-center space-x-3 mb-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold">Expenses</p>
+                        <p class="text-2xl font-bold dark:text-white">${{ total_expense }}</p>
+                    </div>
+                </div>
+                <div class="relative h-2 bg-gray-100 dark:bg-dark-700 rounded-full overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-red-500 to-pink-500 rounded-full animate-[width_2s_ease-out] shadow-lg" style="width: 30%"></div>
+                </div>
+                <p class="text-xs text-red-600 dark:text-red-400 mt-2 font-medium">↘ -5% from last month</p>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="neo-card p-6 rounded-3xl mx-4 mb-6 animate-slide-up animate-delay-300">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h3 class="font-bold text-lg dark:text-white">Weekly Analytics</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Your spending patterns</p>
+                </div>
+            </div>
+            <canvas id="incomeChart" class="w-full h-40"></canvas>
+        </div>
+
+        <!-- Notification Section -->
+        <div class="neo-card p-6 rounded-3xl mx-4 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="font-bold text-lg dark:text-white">Notifications</h2>
+                <button class="text-sm text-blue-500 dark:text-blue-400 hover:underline font-semibold">Mark All Read</button>
+            </div>
+            <ul class="space-y-3">
+                {% for n in notifications %}
+                <li class="flex items-center py-2 border-b border-gray-100 dark:border-dark-700 last:border-b-0">
+                    <span class="w-2 h-2 rounded-full mr-3 {% if not n.is_read %}bg-indigo-500 animate-pulse{% else %}bg-gray-300{% endif %}"></span>
+                    <span class="text-sm flex-1 dark:text-gray-300">{{ n.message }}</span>
+                    <span class="ml-auto text-xs text-gray-400">{{ n.created_at|date:"M d, H:i" }}</span>
+                </li>
+                {% empty %}
+                <li class="text-gray-400 text-center py-4">No notifications yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Cards Section -->
+        <div class="neo-card p-6 rounded-3xl mx-4 mb-6">
+            <h2 class="font-bold text-lg mb-4 dark:text-white">My Cards</h2>
+            <div class="flex gap-4 overflow-x-auto pb-2">
+                {% for card in cards %}
+                <div class="bg-gradient-to-br from-indigo-500 to-purple-500 text-white rounded-xl p-4 min-w-[180px] flex-shrink-0">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="font-bold text-lg">${{ card.balance }}</span>
+                        <span class="text-xs">{{ card.name }}</span>
+                    </div>
+                    <div class="text-xs tracking-widest">{{ card.number }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Transactions Section -->
+        <div class="neo-card p-6 rounded-3xl mx-4 mb-6">
+            <h2 class="font-bold text-lg mb-4 dark:text-white">Recent Transactions</h2>
+            <ul class="space-y-3">
+                {% for t in transactions %}
+                <li class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-dark-700 last:border-b-0">
+                    <div>
+                        <p class="font-medium dark:text-white">{{ t.description }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ t.created_at|date:"M d, H:i" }}</p>
+                    </div>
+                    <span class="font-bold {% if t.type == 'income' %}text-green-500{% else %}text-red-500{% endif %}">
+                        {% if t.type == 'income' %}+{% else %}-{% endif %}${{ t.amount }}
+                    </span>
+                </li>
+                {% empty %}
+                <li class="text-gray-400 text-center py-4">No transactions yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bg-white dark:bg-dark-800 border-t border-gray-200 dark:border-dark-700 fixed bottom-0 w-full max-w-md py-2 px-4 flex justify-between z-10">
+        <button class="flex flex-col items-center text-blue-500 dark:text-blue-400 transition-all hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span class="text-xs">Home</span>
+        </button>
+        <button class="flex flex-col items-center text-gray-500 dark:text-gray-400 transition-all hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-xs">Transactions</span>
+        </button>
+        <button class="flex flex-col items-center text-gray-500 dark:text-gray-400 transition-all hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span class="text-xs">Stats</span>
+        </button>
+        <button class="flex flex-col items-center text-gray-500 dark:text-gray-400 transition-all hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span class="text-xs">Settings</span>
+        </button>
+    </nav>
+
+    <!-- Floating Action Button -->
+    <button class="fixed bottom-20 right-4 w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:shadow-glow hover:scale-110 z-10 animate-bounce-subtle">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+    </button>
+
+    <script>
+        // Dark mode toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIconLight = document.getElementById('theme-icon-light');
+        const themeIconDark = document.getElementById('theme-icon-dark');
+        
+        // Check for saved user preference or use system preference
+        if (localStorage.getItem('color-theme')) {
+            document.documentElement.classList.add(localStorage.getItem('color-theme'));
+            updateIcons();
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('color-theme', 'dark');
+            updateIcons();
+        }
+        
+        themeToggle.addEventListener('click', function() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            }
+            updateIcons();
+        });
+        
+        function updateIcons() {
+            if (document.documentElement.classList.contains('dark')) {
+                themeIconLight.classList.add('hidden');
+                themeIconDark.classList.remove('hidden');
+            } else {
+                themeIconLight.classList.remove('hidden');
+                themeIconDark.classList.add('hidden');
+            }
+        }
+        
+        // Chart initialization
+        const ctx = document.getElementById('incomeChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Income',
+                    data: [120, 190, 300, 500, 200, 300, 400], // Example data
+                    borderColor: '#fff',
+                    backgroundColor: 'rgba(255,255,255,0.2)',
+                    tension: 0.4,
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { display: false },
+                    y: { display: false }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
