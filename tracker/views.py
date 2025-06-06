@@ -1,9 +1,15 @@
 from django.shortcuts import render, redirect
 from .models import Card, Transaction, Notification
 from .forms import TransactionForm
+from django.contrib.auth.decorators import login_required
 
+
+def index(request):
+    return render(request , 'index.html')
 # Create your views here.
 
+
+@login_required
 def dashboard(request):
     cards = Card.objects.all()
     transactions = Transaction.objects.order_by('-date')[:10]

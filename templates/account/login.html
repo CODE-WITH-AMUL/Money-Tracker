@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .input-focus {
+      transition: all 0.3s ease;
+    }
+    .input-focus:focus {
+      transform: scale(1.02);
+      box-shadow: 0 0 10px rgba(79, 70, 229, 0.3);
+    }
+    @media (max-width: 640px) {
+      .form-container {
+        width: 100%;
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-900 min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden form-container">
+    <!-- Login Form -->
+    <div class="p-6 sm:p-8 bg-gray-50">
+      <h2 class="text-2xl sm:text-3xl font-bold text-center text-indigo-800 mb-6 animate-fade-in">Login</h2>
+      {% if messages %}
+        <div class="mb-4">
+          {% for message in messages %}
+            <div class="text-center text-sm {% if message.tags == 'error' %}text-red-600{% else %}text-green-600{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      <form action="{% url 'login' %}" method="POST" class="space-y-4">
+        {% csrf_token %}
+        <div class="relative">
+          <input type="text" name="username" placeholder="Username" required class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 input-focus" />
+          <span class="absolute inset-y-0 right-3 flex items-center text-gray-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+          </span>
+        </div>
+        <div class="relative">
+          <input type="password" name="password" placeholder="Password" required class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 input-focus" />
+          <span class="absolute inset-y-0 right-3 flex items-center text-gray-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0-1.1.9-2 2-2s2 .9 2 2-2 4-2 4m0 0H7a4 4 0 01-4-4v-1a9 9 0 0118 0v1a4 4 0 01-4 4h-5"></path></svg>
+          </span>
+        </div>
+        <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-xl hover:bg-indigo-700 transition transform hover:scale-105">Login</button>
+      </form>
+      <p class="text-sm text-center mt-4">
+        Don't have an account?
+        <a href="{% url 'register' %}" class="text-indigo-600 hover:underline font-semibold">Register</a>
+      </p>
+    </div>
+  </div>
+  <script>
+    // Prevent form submission in sandboxed environment
+    document.querySelectorAll("form").forEach(form => {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        console.log("Form submission prevented for demo purposes.");
+      });
+    });
+  </script>
+</body>
+</html>
